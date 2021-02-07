@@ -9,10 +9,8 @@ import DependencyInjection.Interface.Injector;
 import DependencyInjection.Interface.Provider;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Parameter;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 
@@ -22,13 +20,13 @@ public class InjectorImpl implements Injector {
 
     //получение инстанса класса со всеми иньекциями по классу интерфейса
     @Override
-    public <T> Provider<T> getProvider(Class<T> type) throws NoSuchMethodException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    public <T> Provider<T> getProvider(Class<T> type) {
 
         Class<T> implClass = type;
 
         if (type.isInterface()) {
-            implClass =  interfaceToImplClass.get(type);
-            if (implClass==null){
+            implClass = interfaceToImplClass.get(type);
+            if (implClass == null) {
                 return null;
             }
         }
@@ -60,34 +58,37 @@ public class InjectorImpl implements Injector {
     //регистрация синглтон класса
     @Override
     public <T> void bindSingleton(Class<T> intf, Class<? extends T> impl) {
-
     }
 
     @Override
-    public <T> T createObject(Class<T> type) throws IllegalAccessException, InvocationTargetException, InstantiationException, TooManyConstructorsException, NoSuchMethodException, ConstructorNotFoundException, BindingNotFoundException {
-
-        Constructor<T>[]  constructors = (Constructor<T>[]) type.getDeclaredConstructors();
-        T t;
-        int annotatedConstructors = 0;
-        for (Constructor<T> constructor : constructors) {
-            if (constructor.isAnnotationPresent(Inject.class)){
-                annotatedConstructors++;
-                if (annotatedConstructors > 1) {
-                    throw new TooManyConstructorsException("More than 1 constructor has Inject annotation.");
-                }
-                for (Parameter parameter : constructor.getParameters()) {
-                    t = (T) getProvider(parameter.getType());
-                    if (t == null){
-                        throw new BindingNotFoundException("No found any binding for " + parameter.getType() + " argument");
-                    }
-                }
-            }
+    public <T> T createObject(Class<T> type) throws Exception {
+        if (cache.containsKey(type)){
+            return (T) cache.get(type);
         }
 
-        if (Arrays.stream(constructors).anyMatch(o -> o.getParameterCount()==0)){
-            t = (T) Arrays.stream(constructors).filter(o -> o.getParameterCount()==0).findAny().get().newInstance();
-        }   else throw new ConstructorNotFoundException("No no-args constructor and Inject annotated constructor");
-
+        Constructor<T>[] constructors = (Constructor<T>[]) type.getDeclaredConstructors();
+        T t = null;
+        if (Arrays.stream(constructors).filter(c -> c.isAnnotationPresent(Inject.class)).count() > 1) {
+            throw new TooManyConstructorsException("More than 1 constructor has 'Inject' annotation.");
+        } else if (Arrays.stream(constructors).filter(c -> c.isAnnotationPresent(Inject.class)).count() == 1) {
+            for (Constructor<T> constructor : constructors) {
+                if (constructor.isAnnotationPresent(Inject.class)) {
+                    Parameter[] parameters = constructor.getParameters();
+                    Object[] list = new Object[parameters.length];
+                    for (int i = 0; i < parameters.length; i++) {
+                        if (interfaceToImplClass.get(parameters[i].getType()) != null) {
+                            list[i] = interfaceToImplClass.get(parameters[i].getType()).getDeclaredConstructor().newInstance();
+                        } else throw new BindingNotFoundException("No found any binding for " + parameters[i].getType() + " argument");
+                    }
+                    t = (T) constructor.newInstance(list);
+                }
+            }
+        } else {
+            if (Arrays.stream(constructors).anyMatch(o -> o.getParameterCount() == 0)) {
+                t = (T) Arrays.stream(constructors).filter(o -> o.getParameterCount() == 0).findFirst().get().newInstance();
+            } else throw new ConstructorNotFoundException("No no-args constructor and 'Inject' annotated constructor");
+        }
+        cache.putIfAbsent(type, t);
         return t;
     }
 

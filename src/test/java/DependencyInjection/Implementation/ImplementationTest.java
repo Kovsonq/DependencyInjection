@@ -18,12 +18,11 @@ public class ImplementationTest {
 
 
     @Test
-    public void testExistingBinding() throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, TooManyConstructorsException, ConstructorNotFoundException, BindingNotFoundException {
+    public void testExistingBinding() throws Exception {
         Injector injector = new InjectorImpl(); //создаем имплементацию инжектора
         injector.bind(EventDao.class, InMemoryEventDaoImpl.class); //добавляем в инжектор реализацию интерфейса
         Provider<EventDao> daoProvider = injector.getProvider(EventDao.class); //получаем инстанс класса из инжектора
 
-        injector.createObject(EventServiceImpl.class);
 
         assertNotNull(daoProvider);
         assertNotNull(daoProvider.getInstance());
@@ -31,8 +30,16 @@ public class ImplementationTest {
     }
 
     @Test
-    public void testBindingInService() throws IllegalAccessException, InstantiationException, InvocationTargetException, NoSuchMethodException, TooManyConstructorsException {
+    public void testCreateObjectByDi() throws Exception {
+        EventServiceImpl eventService = new EventServiceImpl(new InMemoryEventDaoImpl());
+
         InjectorImpl injector = new InjectorImpl();
+        injector.bind(EventDao.class, InMemoryEventDaoImpl.class);
+
+        EventServiceImpl eventService2 = injector.createObject(EventServiceImpl.class);
+        EventServiceImpl eventService3 = injector.createObject(EventServiceImpl.class);
+
+        assertSame(eventService2, eventService3);
     }
 
 }
