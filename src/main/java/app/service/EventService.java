@@ -1,4 +1,4 @@
-package App.Service;
+package app.service;
 
 public interface EventService {
 }

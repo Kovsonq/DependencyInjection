@@ -1,13 +1,13 @@
-package DependencyInjection.Implementation;
+package dependencyinjection.implementation;
 
-import App.DAO.EventDao;
-import App.DAO.InMemoryEventDaoImpl;
-import App.Service.*;
-import DependencyInjection.Exception.BindingNotFoundException;
-import DependencyInjection.Exception.ConstructorNotFoundException;
-import DependencyInjection.Exception.TooManyConstructorsException;
-import DependencyInjection.Interface.Injector;
-import DependencyInjection.Interface.Provider;
+import app.dao.EventDao;
+import app.dao.InMemoryEventDaoImpl;
+import app.service.*;
+import dependencyinjection.exception.BindingNotFoundException;
+import dependencyinjection.exception.ConstructorNotFoundException;
+import dependencyinjection.exception.TooManyConstructorsException;
+import dependencyinjection.interfacec.Injector;
+import dependencyinjection.interfacec.Provider;
 import org.junit.Before;
 import org.junit.Test;
 

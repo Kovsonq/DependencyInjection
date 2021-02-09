@@ -1,4 +1,4 @@
-package App.DAO;
+package app.dao;
 
 public interface OtherEventDao {
 }

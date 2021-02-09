@@ -1,4 +1,4 @@
-package DependencyInjection.Annotation;
+package dependencyinjection.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;

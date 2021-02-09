@@ -1,4 +1,4 @@
-package DependencyInjection.Exception;
+package dependencyinjection.exception;
 
 public class TooManyConstructorsException extends Exception {
     public TooManyConstructorsException(String message) {

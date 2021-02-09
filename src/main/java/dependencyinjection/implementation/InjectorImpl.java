@@ -1,12 +1,12 @@
-package DependencyInjection.Implementation;
+package dependencyinjection.implementation;
 
 
-import DependencyInjection.Annotation.Inject;
-import DependencyInjection.Exception.BindingNotFoundException;
-import DependencyInjection.Exception.ConstructorNotFoundException;
-import DependencyInjection.Exception.TooManyConstructorsException;
-import DependencyInjection.Interface.Injector;
-import DependencyInjection.Interface.Provider;
+import dependencyinjection.annotation.Inject;
+import dependencyinjection.exception.BindingNotFoundException;
+import dependencyinjection.exception.ConstructorNotFoundException;
+import dependencyinjection.exception.TooManyConstructorsException;
+import dependencyinjection.interfacec.Injector;
+import dependencyinjection.interfacec.Provider;
 
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Parameter;

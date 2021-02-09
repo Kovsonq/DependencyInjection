@@ -1,8 +1,7 @@
-package App.Service;
+package app.service;
 
-import App.DAO.EventDao;
-import App.DAO.OtherEventDao;
-import DependencyInjection.Annotation.Inject;
+import app.dao.EventDao;
+import dependencyinjection.annotation.Inject;
 
 public class EventServiceImpl implements EventService {
 

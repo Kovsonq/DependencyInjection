@@ -1,8 +1,4 @@
-package DependencyInjection.Interface;
-
-import DependencyInjection.Exception.BindingNotFoundException;
-import DependencyInjection.Exception.ConstructorNotFoundException;
-import DependencyInjection.Exception.TooManyConstructorsException;
+package dependencyinjection.interfacec;
 
 import java.lang.reflect.InvocationTargetException;
 

@@ -1,4 +1,4 @@
-package DependencyInjection.Exception;
+package dependencyinjection.exception;
 
 public class BindingNotFoundException extends Exception {
     public BindingNotFoundException(String message) {
