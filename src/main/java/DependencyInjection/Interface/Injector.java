@@ -14,6 +14,6 @@ public interface Injector {
 
 <T> void bindSingleton(Class<T> intf, Class<? extends T> impl); //регистрация синглтон класса
 
-<T> T createObject(Class<T> type) throws Exception;
+<T> T getObject(Class<T> type) throws Exception;
 
 }

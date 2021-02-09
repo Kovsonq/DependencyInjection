@@ -61,11 +61,23 @@ public class InjectorImpl implements Injector {
     }
 
     @Override
-    public <T> T createObject(Class<T> type) throws Exception {
-        if (cache.containsKey(type)){
-            return (T) cache.get(type);
-        }
+    public <T> T getObject(Class<T> type) throws Exception {
+        Constructor<T>[] constructors = (Constructor<T>[]) type.getDeclaredConstructors();
+        String scope = Arrays.stream(constructors).filter(c -> c.isAnnotationPresent(Inject.class)).findFirst().get().getAnnotation(Inject.class).scope();
+        T t = null;
+        if (scope.equals("singleton") || scope.isEmpty()) {
+            if (cache.containsKey(type)) {
+                return (T) cache.get(type);
+            }
+            t = createObject(type);
+            cache.putIfAbsent(type, t);
+        } else if (scope.equals("prototype")) {
+            t = createObject(type);
+        } else throw new IllegalArgumentException("Wrong scope type");
+        return t;
+    }
 
+    public <T> T createObject(Class<T> type) throws Exception {
         Constructor<T>[] constructors = (Constructor<T>[]) type.getDeclaredConstructors();
         T t = null;
         if (Arrays.stream(constructors).filter(c -> c.isAnnotationPresent(Inject.class)).count() > 1) {
@@ -78,7 +90,8 @@ public class InjectorImpl implements Injector {
                     for (int i = 0; i < parameters.length; i++) {
                         if (interfaceToImplClass.get(parameters[i].getType()) != null) {
                             list[i] = interfaceToImplClass.get(parameters[i].getType()).getDeclaredConstructor().newInstance();
-                        } else throw new BindingNotFoundException("No found any binding for " + parameters[i].getType() + " argument");
+                        } else
+                            throw new BindingNotFoundException("No found any binding for " + parameters[i].getType() + " argument");
                     }
                     t = (T) constructor.newInstance(list);
                 }
@@ -88,7 +101,6 @@ public class InjectorImpl implements Injector {
                 t = (T) Arrays.stream(constructors).filter(o -> o.getParameterCount() == 0).findFirst().get().newInstance();
             } else throw new ConstructorNotFoundException("No no-args constructor and 'Inject' annotated constructor");
         }
-        cache.putIfAbsent(type, t);
         return t;
     }
 

@@ -4,22 +4,22 @@ import App.DAO.EventDao;
 import App.DAO.OtherEventDao;
 import DependencyInjection.Annotation.Inject;
 
-public class EventServiceImpl implements EventService {
+public class EventServiceImplTwoInject implements EventService {
 
     private String name;
-
     private EventDao eventDao;
 
-    @Inject(scope = "singleton")
-    public EventServiceImpl(EventDao eventDao) {
+    @Inject
+    public EventServiceImplTwoInject(EventDao eventDao) {
         this.eventDao = eventDao;
     }
 
-    public EventServiceImpl(String name) {
+    @Inject
+    public EventServiceImplTwoInject(String name) {
         this.name = name;
     }
 
-    public EventServiceImpl() {
+    public EventServiceImplTwoInject() {
     }
 
 }
