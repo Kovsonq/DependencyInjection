@@ -63,17 +63,22 @@ public class InjectorImpl implements Injector {
     @Override
     public <T> T getObject(Class<T> type) throws Exception {
         Constructor<T>[] constructors = (Constructor<T>[]) type.getDeclaredConstructors();
-        String scope = Arrays.stream(constructors).filter(c -> c.isAnnotationPresent(Inject.class)).findFirst().get().getAnnotation(Inject.class).scope();
-        T t = null;
-        if (scope.equals("singleton") || scope.isEmpty()) {
-            if (cache.containsKey(type)) {
-                return (T) cache.get(type);
-            }
+        T t;
+        if (Arrays.stream(constructors).anyMatch(c -> c.isAnnotationPresent(Inject.class))) {
+            String scope = Arrays.stream(constructors).filter(c -> c.isAnnotationPresent(Inject.class)).findFirst().get().getAnnotation(Inject.class).scope();
+            if (scope.equals("singleton") || scope.isEmpty()) {
+                if (cache.containsKey(type)) {
+                    return (T) cache.get(type);
+                }
+                t = createObject(type);
+                cache.putIfAbsent(type, t);
+            } else if (scope.equals("prototype")) {
+                t = createObject(type);
+            } else throw new IllegalArgumentException("Wrong scope type");
+        } else {
             t = createObject(type);
-            cache.putIfAbsent(type, t);
-        } else if (scope.equals("prototype")) {
-            t = createObject(type);
-        } else throw new IllegalArgumentException("Wrong scope type");
+        }
+
         return t;
     }
 
